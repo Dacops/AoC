@@ -24,6 +24,7 @@ def recurs(available_patterns, impossible_patterns, min_length, max_length, patt
     total = 0
     for i in range(min_length, max_length+1):
         if pattern[:i] in available_patterns.keys():
+            print(pattern[:i], pattern[i:])
             total += recurs(available_patterns, impossible_patterns, min_length, max_length, pattern[i:])
     if total:
         available_patterns[pattern] = total
@@ -50,8 +51,15 @@ def star2(file):
         else:
             ap[pattern] = available_patterns[pattern]
     
+    for pattern in desired_patterns:
+        print(" -> ", pattern, recurs(ap, set(), min_length, max_length, pattern))
     return sum(recurs(ap, set(), min_length, max_length, pattern) for pattern in desired_patterns)	
 
+    # brgr shows 3 instead of 2
+    # b + rgr
+    # rgr gets splitted twice, into r + gr and rg + r
+    # even though rg is r + g (cached from bwurrg)
+    # dups 1 
 
 print(f"STAR 1: {star1('input.txt')}")
 print(f"STAR 2: {star2('input.txt')}")
