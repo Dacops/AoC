@@ -2,13 +2,11 @@ def star1(file):
     with open(file, 'r') as f:
         lines = f.readlines()
 
-    empty, rolls = set(), set()
+    rolls = set()
     for y, line in enumerate(lines):
         for x, char in enumerate(line.strip()):
             if char == '@':
                 rolls.add((y, x))
-            if char == '.':
-                empty.add((y, x))
 
     def num_adjacent(pos):
         y, x = pos
@@ -23,13 +21,11 @@ def star2(file):
     with open(file, 'r') as f:
         lines = f.readlines()
 
-    empty, rolls = set(), set()
+    rolls = set()
     for y, line in enumerate(lines):
         for x, char in enumerate(line.strip()):
             if char == '@':
                 rolls.add((y, x))
-            if char == '.':
-                empty.add((y, x))
 
     def num_adjacent(pos):
         y, x = pos
