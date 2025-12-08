@@ -8,41 +8,44 @@ def star1(file):
         spots.append((x, y, z))
 
     from math import sqrt
-    distances = [[0]*i for i in range(len(spots))]
+    distances = []
     for i in range(len(spots)):
         for j in range(len(spots)):
             if i > j:
                 x1, y1, z1 = spots[i]
                 x2, y2, z2 = spots[j]
-                distances[i][j] = sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+                dist = sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+                distances += [(dist, i, j)]
+    distances = sorted(distances)
 
-    circuits = set()
-    for i in range(len(spots)):
-        circuits.add(frozenset({i}))
+    def boss(x):
+        while parent[x] != x:
+            x = parent[x]
+        return x
 
     NUM_PAIRS = 1000
+    parent = [i for i in range(len(spots))]
     for _ in range(NUM_PAIRS):
-        x, y = 0, 0
-        min_dist = min(val for row in distances for val in row if val > 0)
-        for i, row in enumerate(distances):
-            if min_dist in row:
-                x, y = row.index(min_dist), i
-                break
-        distances[y][x] = 0
-        
-        xset, yset = set(), set()
-        for circuit in circuits:
-            if x in circuit:
-                xset = circuit
-            if y in circuit:
-                yset = circuit
-        if xset != yset:
-            circuits.remove(xset)
-            circuits.remove(yset)
-            circuits.add(xset.union(yset))
+        _, x, y = distances.pop(0)
+        parent[boss(x)] = boss(y)
 
-    from math import prod
-    return prod(sorted((len(s) for s in circuits), reverse=True)[:3])
+    def kids(sons, count):
+        new_sons = []
+        for i in range(len(parent)):
+            if parent[i] in sons and i not in sons:
+                new_sons += [i]
+                count += 1
+        if new_sons:
+            return kids(new_sons, count)
+        return count
+
+    sizes = [-1 for _ in range(len(spots))]
+    for i in range(len(parent)):
+        if parent[i] == i:
+            sizes[i] = kids([i], 1)
+
+    sizes = sorted(sizes, reverse=True)
+    return sizes[0] * sizes[1] * sizes[2]
 
 def star2(file):
     with open(file, 'r') as f:
@@ -54,39 +57,27 @@ def star2(file):
         spots.append((x, y, z))
 
     from math import sqrt
-    distances = [[0]*i for i in range(len(spots))]
+    distances = []
     for i in range(len(spots)):
         for j in range(len(spots)):
             if i > j:
                 x1, y1, z1 = spots[i]
                 x2, y2, z2 = spots[j]
-                distances[i][j] = sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+                dist = sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+                distances += [(dist, i, j)]
+    distances = sorted(distances)
 
-    circuits = set()
-    for i in range(len(spots)):
-        circuits.add(frozenset({i}))
+    def boss(x):
+        while parent[x] != x:
+            x = parent[x]
+        return x
 
+    parent = [i for i in range(len(spots))]
     while True:
-        x, y = 0, 0
-        min_dist = min(val for row in distances for val in row if val > 0)
-        for i, row in enumerate(distances):
-            if min_dist in row:
-                x, y = row.index(min_dist), i
-                break
-        distances[y][x] = 0
-        
-        xset, yset = set(), set()
-        for circuit in circuits:
-            if x in circuit:
-                xset = circuit
-            if y in circuit:
-                yset = circuit
-        if xset != yset:
-            circuits.remove(xset)
-            circuits.remove(yset)
-            circuits.add(xset.union(yset))
+        dist, x, y = distances.pop(0)
+        parent[boss(x)] = boss(y)
 
-        if len(circuits) == 1:
+        if sum(parent[i] == i for i in range(len(parent))) == 1:
             return spots[x][0] * spots[y][0]
 
 print(f"STAR 1: {star1('input.txt')}")
